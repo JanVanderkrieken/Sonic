@@ -91,8 +91,11 @@ namespace TestWPF
 
             WidthWindow = Width;
 
-            StartGrid.Children.Add(Map.MapImageControl);
-            
+            StartGrid.Children.Add(Map.MapImageControl1);
+            //StartGrid.Children.Add(Map.MapImageControl2);
+            //StartGrid.Children.Add(Map.MapImageControl3);
+            StartGrid.Children.Add(Map.MapImageControlSVG);
+
             //BitmapImage bug = new BitmapImage(new Uri("pack://application:,,,/Resources/LadyBug.bmp", UriKind.Absolute));
             //sonicImage.Source = sonic.SonicImage;
             //sonicImage.Stretch = Stretch.None;

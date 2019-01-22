@@ -272,7 +272,7 @@ namespace TestWPF
 
 
             ClipImage(SonicImageControl, MyRect, IsFlipped);
-            MainWindow.DebugText(new Dictionary<string, string> { { "My Left", SonicImage.Margin.Left.ToString() }, { "My Right", SonicImage.Margin.Right.ToString() } });
+            //MainWindow.DebugText(new Dictionary<string, string> { { "My Left", SonicImage.Margin.Left.ToString() }, { "My Right", SonicImage.Margin.Right.ToString() } });
         }
 
         public void MoveMe(double deltatime, double Xspeed, double Yspeed)
@@ -288,7 +288,7 @@ namespace TestWPF
             if (thick.Left <= 0 && IsFlipped)
             {
                 thick.Left = 0;
-                if (Map.MapImageControl.Margin.Left < 0)
+                if (Map.MapImageControl1.Margin.Left < 0)
                 {
                     Map.MoveMap(-Xspeed, -Yspeed);
                 }
