@@ -272,7 +272,8 @@ namespace TestWPF
 
 
             ClipImage(SonicImageControl, MyRect, IsFlipped);
-            //MainWindow.DebugText(new Dictionary<string, string> { { "My Left", SonicImage.Margin.Left.ToString() }, { "My Right", SonicImage.Margin.Right.ToString() } });
+            //ClipImage(SonicImageControl, new Rect(0,0,sonicImage.Width,sonicImage.Height), IsFlipped);
+            MainWindow.DebugText(new Dictionary<string, string> { { "My Left", SonicImage.Margin.Bottom.ToString() }, { "My Right", SonicImage.Margin.Top.ToString() } });
         }
 
         public void MoveMe(double deltatime, double Xspeed, double Yspeed)

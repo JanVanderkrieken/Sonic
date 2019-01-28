@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TestWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp" Background="#FF0080FF">
+        Title="MainWindow" Height="450" Width="800" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp" Background="#FF0080FF" MouseDown="HeadWindow_MouseDown">
     <Grid x:Name="StartGrid">
         <Image x:Name="Animatie" HorizontalAlignment="Left" Stretch="None" >
             <!--<Image.Clip>

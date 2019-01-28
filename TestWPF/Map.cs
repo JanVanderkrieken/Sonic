@@ -24,7 +24,7 @@ namespace TestWPF
         public static System.Windows.Controls.Image MapImageControl1 = new System.Windows.Controls.Image();
         //public static System.Windows.Controls.Image MapImageControl2 = new System.Windows.Controls.Image();
         //public static System.Windows.Controls.Image MapImageControl3 = new System.Windows.Controls.Image();
-        public static System.Windows.Controls.Image MapImageControlSVG = new System.Windows.Controls.Image();
+        public static OpaqueClickableImage MapImageControlSVG = new OpaqueClickableImage();
 
         public static void Create()
         {           
@@ -59,9 +59,12 @@ namespace TestWPF
             MapImageControlSVG.HorizontalAlignment = HorizontalAlignment.Left;
             MapImageControlSVG.VerticalAlignment = VerticalAlignment.Top;
             MapImageControlSVG.Margin = new Thickness(0, -1190, 0, 0);
-
+            //MapImageControlSVG.Visibility = Visibility.Hidden;
+            
 
         }
+
+
 
         /// <summary>
         /// Moves the map if Sonic is in the middle of the screen
@@ -80,10 +83,71 @@ namespace TestWPF
             //MapImageControl2.Margin = thick;
             //thick.Left += 4076;
             //MapImageControl3.Margin = thick;
-            MainWindow.DebugText(new Dictionary<string, string> { { "map left", MapImageControl1.Margin.Left.ToString() }, { "map top", MapImageControl1.Margin.Top.ToString() } });
+            //MainWindow.DebugText(new Dictionary<string, string> { { "map left", MapImageControl1.Margin.Left.ToString() }, { "map top", MapImageControl1.Margin.Top.ToString() } });
         }
 
-        //public static bool HitMap(
+        public static bool HitMap(System.Windows.Point point)
+        {
+            var result = VisualTreeHelper.HitTest(Map.MapImageControlSVG, point);
+
+
+            if (/*hitResultsList.Count >0*/ result != null)
+            {
+                // Perform action on hit visual object.
+                //DebugText(new Dictionary<string, string> { { "is hit", "true" } });
+                return true;
+            }
+                //DebugText(new Dictionary<string, string> { { "is hit", "false" } });
+
+            return false;
+        }
+    }
+
+    public class OpaqueClickableImage : System.Windows.Controls.Image
+    {
+        protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
+        {
+            var source = (BitmapSource)Source;
+
+            // Get the pixel of the source that was hit
+            var x = (int)(hitTestParameters.HitPoint.X / ActualWidth * source.PixelWidth-Margin.Left);
+            var y = (int)(hitTestParameters.HitPoint.Y / ActualHeight * source.PixelHeight-Margin.Top);
+
+            // Copy the single pixel into a new byte array representing RGBA
+            var pixel = new byte[4];
+            source.CopyPixels(new Int32Rect(x, y, 1, 1), pixel, 4, 0);
+
+            // Check the alpha (transparency) of the pixel
+            // - threshold can be adjusted from 0 to 255
+            if (pixel[3] > 10)
+            {
+                return new PointHitTestResult(this, hitTestParameters.HitPoint);
+
+            }
+                return null;
+
+        }
+        protected override GeometryHitTestResult HitTestCore(GeometryHitTestParameters hitTestParameters)
+        {
+            var source = (BitmapSource)Source;
+
+            var rect = new Int32Rect((int)hitTestParameters.HitGeometry.Bounds.Left,(int)hitTestParameters.HitGeometry.Bounds.Top,(int)hitTestParameters.HitGeometry.Bounds.Width,(int)hitTestParameters.HitGeometry.Bounds.Height);
+
+            int stride = (int)source.PixelWidth * (source.Format.BitsPerPixel / 8);
+            byte[] pixels = new byte[(int)rect.Height * stride];
+            source.CopyPixels(rect, pixels,stride, 0);
+
+            if (!pixels.Contains((byte)0))
+            {
+
+            }
+
+            IntersectionDetail intersectionDetail = IntersectionDetail.NotCalculated;
+
+            // Perform custom actions during the hit test processing.
+
+            return new GeometryHitTestResult(this, intersectionDetail);
+        }
     }
 
     public class SVGParser

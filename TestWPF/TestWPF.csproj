@@ -35,8 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Svg, Version=2.4.0.42491, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
-      <HintPath>..\packages\Svg.2.4.0\lib\Svg.dll</HintPath>
+    <Reference Include="Svg, Version=2.4.1.756, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\packages\Svg.2.4.1\lib\Svg.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -139,7 +139,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\map.tif" />
-    <Resource Include="map.tif" />
     <Content Include="Resources\map.svg" />
     <Resource Include="Resources\mapdeel2.png" />
     <Resource Include="Resources\mapdeel3.png" />

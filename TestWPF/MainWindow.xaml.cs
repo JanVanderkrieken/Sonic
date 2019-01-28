@@ -61,6 +61,7 @@ namespace TestWPF
         //maybe a menu where the keybindings can change
         List<IEnemy> listEnemies = new List<IEnemy>();
 
+        static bool isDebug = true;
 
 
         /*
@@ -147,6 +148,12 @@ namespace TestWPF
         private void DisTimer_Tick(object sender, EventArgs e)
         {
             sonic.Tick(1, KeysDown);
+            bool isMaphit = Map.HitMap(new System.Windows.Point(sonic.SonicImage.Margin.Left, sonic.SonicImage.Margin.Top + sonic.SonicImage.Margin.Bottom*2));
+            while (isMaphit)
+            {
+                sonic.MoveMe(1, 0, -1);
+                isMaphit = Map.HitMap(new System.Windows.Point(sonic.SonicImage.Margin.Left, sonic.SonicImage.Margin.Top + sonic.SonicImage.Margin.Bottom * 2));
+            }
             // TellerTick++;
             // TimerTeller++;
             // if (IsDdown)
@@ -232,13 +239,13 @@ namespace TestWPF
         public static void ClipImage(System.Windows.Controls.Image image, Rect visibleRect, bool isFlipped)
         {
             Thickness thickMargin = new Thickness(image.Margin.Left, image.Margin.Top, image.Margin.Right, image.Margin.Bottom);
-            image.RenderTransform = new TranslateTransform(-visibleRect.X,visibleRect.Height - visibleRect.Y);
+            image.RenderTransform = new TranslateTransform(-visibleRect.X, visibleRect.Height - visibleRect.Y);
             if (isFlipped)
             {
                 //    ScaleTransform flipTrans = new ScaleTransform(-1, 0, dikteBug.Left + Animatie.ActualWidth / 2, dikteBug.Top);
                 //    Animatie.RenderTransform = flipTrans;
                 image.FlowDirection = FlowDirection.RightToLeft;
-                image.RenderTransform = new TranslateTransform(visibleRect.X-(image.ActualWidth-visibleRect.Width),visibleRect.Height - visibleRect.Y);
+                image.RenderTransform = new TranslateTransform(visibleRect.X - (image.ActualWidth - visibleRect.Width), visibleRect.Height - visibleRect.Y);
                 //thickMargin.Left -= image.ActualWidth / 2;
                 //thickMargin.Right = thickMargin.Left;
                 //thickMargin.Left = 0;
@@ -247,7 +254,7 @@ namespace TestWPF
             else if (image.FlowDirection == FlowDirection.RightToLeft)
             {
                 image.FlowDirection = FlowDirection.LeftToRight;
-                image.RenderTransform = new TranslateTransform(-visibleRect.X,  visibleRect.Height - visibleRect.Y);
+                image.RenderTransform = new TranslateTransform(-visibleRect.X, visibleRect.Height - visibleRect.Y);
             }
             //image.Margin.Left = visibleRect.X;
             image.Clip = new RectangleGeometry
@@ -438,9 +445,11 @@ namespace TestWPF
                         break;
                     case Key.Up:
                         Map.MoveMap(0, -10);
+                        //sonic.MoveMe(1, 0, -1);
                         break;
                     case Key.Down:
                         Map.MoveMap(0, 10);
+                        //sonic.MoveMe(1, 0, 1);
                         break;
                     case Key.Left:
                         Map.MoveMap(-10, 0);
@@ -540,6 +549,7 @@ namespace TestWPF
         /// <param name="whatToDebug">key = what text the label must say, value = what data the label must say. Dont use space and/or '=' in the end and the beginning of the key and value</param>
         public static void DebugText(Dictionary<string, string> whatToDebug)
         {
+            if (!isDebug) return;
             string newText = "";
             if (whatToDebug.Count > 0)
             {
@@ -553,6 +563,69 @@ namespace TestWPF
             {
                 item.lblTeller.Content = newText;
             }
+        }
+
+        private void HeadWindow_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            System.Windows.Point pt = e.GetPosition((UIElement)sender);
+
+            EllipseGeometry expandedHitTestArea = new EllipseGeometry(new Rect(sonic.SonicImage.Margin.Left,sonic.SonicImage.Margin.Top,sonic.SonicImage.ActualWidth,sonic.SonicImage.ActualHeight));
+
+            hitResultsList.Clear();
+
+            // Perform the hit test against a given portion of the visual object tree.
+            //VisualTreeHelper.HitTest(Map.MapImageControlSVG,null,new HitTestResultCallback(MyHitTestResultCallback), new GeometryHitTestParameters(expandedHitTestArea));
+
+            //var result = VisualTreeHelper.HitTest(Map.MapImageControlSVG, new System.Windows.Point(sonic.SonicImage.Margin.Left, sonic.SonicImage.ActualHeight+sonic.SonicImage.Margin.Bottom));
+            var result = VisualTreeHelper.HitTest(Map.MapImageControlSVG, pt);
+            //var result = VisualTreeHelper.HitTest(Map.MapImageControlSVG, new System.Windows.Point(sonic.SonicImage.Margin.Left + (sonic.SonicImage.ActualWidth/2), sonic.SonicImage.ActualHeight + sonic.SonicImage.Margin.Bottom));
+
+
+            if (/*hitResultsList.Count >0*/ result != null)
+            {
+                // Perform action on hit visual object.
+                DebugText(new Dictionary<string, string> { { "is hit", "true" } });
+                
+            }
+            else
+            {
+                DebugText(new Dictionary<string, string> { { "is hit", "false" } });
+            }
+            
+        }
+
+        List<object> hitResultsList = new List<object>();
+
+        private HitTestResultBehavior MyHitTestResultCallback(HitTestResult result)
+        {
+            // Retrieve the results of the hit test.
+            IntersectionDetail intersectionDetail = ((GeometryHitTestResult)result).IntersectionDetail;
+
+            switch (intersectionDetail)
+            {
+                case IntersectionDetail.FullyContains:
+
+                    // Add the hit test result to the list that will be processed after the enumeration.
+
+                    return HitTestResultBehavior.Continue;
+
+                case IntersectionDetail.Intersects:
+
+                    hitResultsList.Add(result.VisualHit);
+
+
+                    // Set the behavior to return visuals at all z-order levels.
+                    return HitTestResultBehavior.Continue;
+
+                case IntersectionDetail.FullyInside:
+
+                    // Set the behavior to return visuals at all z-order levels.
+                    return HitTestResultBehavior.Continue;
+
+                default:
+                    return HitTestResultBehavior.Stop;
+            }
+
         }
     }
     public static class Bitmapp
