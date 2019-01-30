@@ -40,7 +40,7 @@ namespace TestWPF
         //double tellerFrames = 0;
         //Thickness dikte, dikteBug = new Thickness(0, 0, 0, 0);// margin voor animatie
         //CURRENT_STATE currentState = CURRENT_STATE.WAITING;
-        Dictionary<string, bool> KeysDown = new Dictionary<string, bool>(5);
+        Dictionary<string, bool> KeysDown = new Dictionary<string, bool>(7);
         //public bool IsQdown, IsSdown, IsDdown, IsZdown, IsSpacedown = false;
         //Geometry resetClip;
         //Transform resetRenderTransform;
@@ -50,6 +50,7 @@ namespace TestWPF
         Sonic sonic = new Sonic();
 
         public static double WidthWindow;
+        public static double HeightWindow;
 
         //double widthBug;
         //double TellerTick, TellerKeyDown = 0;
@@ -91,6 +92,7 @@ namespace TestWPF
             disTimer.Start();
 
             WidthWindow = Width;
+            HeightWindow = Height;
 
             StartGrid.Children.Add(Map.MapImageControl1);
             //StartGrid.Children.Add(Map.MapImageControl2);
@@ -128,6 +130,8 @@ namespace TestWPF
             KeysDown.Add("S", false);
             KeysDown.Add("D", false);
             KeysDown.Add("Space", false);
+            KeysDown.Add("Up", false);
+            KeysDown.Add("Down", false);
             CreateEnemies();
             Map.Create();
         }
@@ -149,9 +153,11 @@ namespace TestWPF
         {
             sonic.Tick(1, KeysDown);
             bool isMaphit = Map.HitMap(new System.Windows.Point(sonic.SonicImage.Margin.Left, sonic.SonicImage.Margin.Top + sonic.SonicImage.Margin.Bottom*2));
+            if (!isMaphit) sonic.IsIntheAir = true;
             while (isMaphit)
             {
                 sonic.MoveMe(1, 0, -1);
+                sonic.IsIntheAir = false;
                 isMaphit = Map.HitMap(new System.Windows.Point(sonic.SonicImage.Margin.Left, sonic.SonicImage.Margin.Top + sonic.SonicImage.Margin.Bottom * 2));
             }
             // TellerTick++;
@@ -446,6 +452,7 @@ namespace TestWPF
                     case Key.Up:
                         Map.MoveMap(0, -10);
                         //sonic.MoveMe(1, 0, -1);
+
                         break;
                     case Key.Down:
                         Map.MoveMap(0, 10);
@@ -569,7 +576,7 @@ namespace TestWPF
         {
             System.Windows.Point pt = e.GetPosition((UIElement)sender);
 
-            EllipseGeometry expandedHitTestArea = new EllipseGeometry(new Rect(sonic.SonicImage.Margin.Left,sonic.SonicImage.Margin.Top,sonic.SonicImage.ActualWidth,sonic.SonicImage.ActualHeight));
+            //EllipseGeometry expandedHitTestArea = new EllipseGeometry(new Rect(sonic.SonicImage.Margin.Left,sonic.SonicImage.Margin.Top,sonic.SonicImage.ActualWidth,sonic.SonicImage.ActualHeight));
 
             hitResultsList.Clear();
 

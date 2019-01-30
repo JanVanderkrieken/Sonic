@@ -59,7 +59,7 @@ namespace TestWPF
             MapImageControlSVG.HorizontalAlignment = HorizontalAlignment.Left;
             MapImageControlSVG.VerticalAlignment = VerticalAlignment.Top;
             MapImageControlSVG.Margin = new Thickness(0, -1190, 0, 0);
-            //MapImageControlSVG.Visibility = Visibility.Hidden;
+            MapImageControlSVG.Visibility = Visibility.Hidden;
             
 
         }
@@ -76,7 +76,12 @@ namespace TestWPF
             var thick = MapImageControl1.Margin;
             thick.Left += PosXDifferance;
             thick.Top += PosYDifferance;
+            if (thick.Left > 0)
+            {
+                thick.Left = 0;
+            }
             MapImageControl1.Margin = thick;
+            
             //thick.Top += 500;
             MapImageControlSVG.Margin = thick;
             //thick.Left += 3298;

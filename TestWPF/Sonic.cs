@@ -47,10 +47,13 @@ namespace TestWPF
         double MyBreakingXPos, MyBreakingYPos = 0;
 
         double MyXSpeed, MyYSpeed = 0;
+        double MyXAcceleration, MyYAcceleration = 0;
+        const double GravityAcceleration = 1;
+        const double FrictionAcceleration = 0.5;
 
-        bool IsIntheAir = true; // a bool to check if he is in the air so he couldn't jump (again)
-                                // would set to true if SPACE would be pressed or he is using a spring up or fall from a cliff
-                                // can be used to check if he needs gravity or not
+        public bool IsIntheAir = true; // a bool to check if he is in the air so he couldn't jump (again)
+                                       // would set to true if SPACE would be pressed or he is using a spring up or fall from a cliff
+                                       // can be used to check if he needs gravity or not
         public bool IsFlipped = false;
 
         double Tickteller, teller = 0;
@@ -68,7 +71,7 @@ namespace TestWPF
             MyHeight = sonicImage.Height / 5;
 
             MyRect = new Rect(0, 0, MyWidth, MyHeight);
-            SonicImage.Margin = new Thickness(0, 200, MyWidth, MyHeight);
+            SonicImage.Margin = new Thickness(0,200, MyWidth, MyHeight);
 
         }
         private BitmapImage sonicImage;
@@ -99,8 +102,16 @@ namespace TestWPF
 
         public void Tick(double Deltatime, Dictionary<string, bool> KeysDown)
         {
+            if(SonicImage.Margin.Top != HeightWindow / 3)
+            {
+                var temp = SonicImage.Margin;
+                temp.Top = HeightWindow / 3;
+                SonicImage.Margin = temp;
+            }
+            MyXAcceleration = 0;
+            MyYAcceleration = 0;
             Tickteller++;
-            teller++;
+            //teller++;
             switch (currentState)
             {
                 case CURRENT_STATE.AFK:
@@ -138,13 +149,13 @@ namespace TestWPF
                 case CURRENT_STATE.BREAKING:
                     if (!IsFlipped && SonicImageControl.Margin.Left < MyBreakingXPos + 50)
                     {
-                        MyXSpeed = 10;
-                        MoveMe(1, MyXSpeed, MyYSpeed);
+                        //MyXSpeed = 10;
+                        //MoveMe(1, MyXSpeed, MyYSpeed);
                     }
                     else if (IsFlipped && SonicImageControl.Margin.Left > MyBreakingXPos - 50)
                     {
-                        MyXSpeed = -10;
-                        MoveMe(1, MyXSpeed, MyYSpeed);
+                        //MyXSpeed = -10;
+                        //MoveMe(1, MyXSpeed, MyYSpeed);
                     }
                     else if (SonicImageControl.Margin.Left <= MyBreakingXPos - 50 || SonicImageControl.Margin.Left >= MyBreakingXPos + 50)
                     {
@@ -160,6 +171,14 @@ namespace TestWPF
 
                 case CURRENT_STATE.LOOKDOWN:
                     teller = 5;
+                    break;
+
+                case CURRENT_STATE.BALANCING:
+                    if (teller < 3)
+                    {
+                        goto default;
+                    }
+                    teller = 2;
                     break;
 
                 case CURRENT_STATE.LOOKUP:
@@ -188,9 +207,10 @@ namespace TestWPF
                     }
                     else
                     {
-                        MyXSpeed = 10;
+                        MyXAcceleration += 2;
+                        //MyXSpeed = 10;
                         IsFlipped = false;
-                        MoveMe(1, MyXSpeed, MyYSpeed);
+                        //MoveMe(1, MyXSpeed, MyYSpeed);
                         currentState = CURRENT_STATE.WALKING;
                     }
                 }
@@ -216,10 +236,16 @@ namespace TestWPF
                     }
                     else
                     {
-                        MyXSpeed = -10;
-                        IsFlipped = true;
-                        MoveMe(1, MyXSpeed, MyYSpeed);
-                        currentState = CURRENT_STATE.WALKING;
+                        if (currentState != CURRENT_STATE.PUSHING)
+                        {
+
+
+                            MyXAcceleration += -2;
+                            //MyXSpeed = -10;
+                            IsFlipped = true;
+                            //MoveMe(1, MyXSpeed, MyYSpeed);
+                            currentState = CURRENT_STATE.WALKING;
+                        }
                     }
 
                 }
@@ -244,12 +270,25 @@ namespace TestWPF
                 currentState = CURRENT_STATE.WAITING;
             }
 
+            if (MyXSpeed != 0)
+            {
+                currentState = CURRENT_STATE.WALKING;
+            }
+
             MyRect.Y = (int)currentState * MyHeight;
             if ((int)currentState < 0)
             {
                 MyRect.Y = 0;
             }
             MyRect.X = teller * MyWidth;
+            if (currentState == CURRENT_STATE.BALANCING)
+            {
+                MyRect.Y = 4 * MyHeight;
+                if (teller < 2)
+                {
+                    MyRect.X = 2 * MyWidth;
+                }
+            }
 
             if (Tickteller >= 30 && (currentState == CURRENT_STATE.WAITING || currentState == CURRENT_STATE.AFK))
             {
@@ -269,39 +308,74 @@ namespace TestWPF
                 In Sonic.cpp m_Velocity += m_Acceleration * deltatime
                 m_Pos.x += m_Velocity * deltatime
              */
+            if (IsIntheAir)
+            {
+                MyYSpeed += GravityAcceleration;
 
-
+            }
+            MyXSpeed += MyXAcceleration;
+            MyYSpeed += MyYAcceleration;
+            MainWindow.DebugText(new Dictionary<string, string> { { "My Xspeed", MyXSpeed.ToString() }, { "My Yspeed", MyYSpeed.ToString() }, { "My X acc", MyXAcceleration.ToString() }, { "My Y acc", MyYAcceleration.ToString() } });
+            MoveMe(Deltatime, MyXSpeed, MyYSpeed);
             ClipImage(SonicImageControl, MyRect, IsFlipped);
             //ClipImage(SonicImageControl, new Rect(0,0,sonicImage.Width,sonicImage.Height), IsFlipped);
-            MainWindow.DebugText(new Dictionary<string, string> { { "My Left", SonicImage.Margin.Bottom.ToString() }, { "My Right", SonicImage.Margin.Top.ToString() } });
         }
 
         public void MoveMe(double deltatime, double Xspeed, double Yspeed)
         {
+            bool sonicMove = true;
             var thick = SonicImageControl.Margin;
-            thick.Left += Xspeed * deltatime;// This is m = m/s *s
             //thick.Right += Xspeed * deltatime;
-            if (thick.Left >= MainWindow.WidthWindow / 2 && !IsFlipped)
+            if (thick.Left == MainWindow.WidthWindow / 2 || thick.Left > WidthWindow / 2)
             {
+                sonicMove = false;
                 thick.Left = MainWindow.WidthWindow / 2;
-                Map.MoveMap(-Xspeed, -Yspeed);
+                Map.MoveMap(-Xspeed,0);
+                if (Map.MapImageControl1.Margin.Left >= 0 && IsFlipped)
+                {
+                    var temp = Map.MapImageControl1.Margin;
+                    temp.Left = 0;
+                    Map.MapImageControl1.Margin = temp;
+                    thick.Left += Xspeed * deltatime;
+                    sonicMove = true;
+                }
+
             }
             if (thick.Left <= 0 && IsFlipped)
             {
                 thick.Left = 0;
+                MyXSpeed = 0;
                 if (Map.MapImageControl1.Margin.Left < 0)
                 {
-                    Map.MoveMap(-Xspeed, -Yspeed);
+                    Map.MoveMap(-Xspeed,0);
                 }
                 else
                 {
                     currentState = CURRENT_STATE.PUSHING;
                 }
             }
-            thick.Top += Yspeed * deltatime;
+            if (sonicMove)
+            {
+                thick.Left += Xspeed * deltatime;// This is m = m/s *s
+
+            }
+            Map.MoveMap(0, -Yspeed);
+            //thick.Top += Yspeed * deltatime;
             SonicImageControl.Margin = thick;
-            MyXSpeed = 0;
-            MyYSpeed = 0;
+            //MyXSpeed = 0;
+            //MyYSpeed = 0;
+            if (!IsIntheAir)
+            {
+                MyYSpeed = 0;
+            }
+            if (MyXSpeed > 0)
+            {
+                MyXSpeed -= FrictionAcceleration;
+            }
+            else if (MyXSpeed < 0)
+            {
+                MyXSpeed += FrictionAcceleration;
+            }
         }
     }
 }

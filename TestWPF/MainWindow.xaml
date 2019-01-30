@@ -7,11 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp" Background="#FF0080FF" MouseDown="HeadWindow_MouseDown">
     <Grid x:Name="StartGrid">
-        <Image x:Name="Animatie" HorizontalAlignment="Left" Stretch="None" >
-            <!--<Image.Clip>
+        <!--<Image x:Name="Animatie" HorizontalAlignment="Left" Stretch="None" Panel.ZIndex="10" >
+            <Image.Clip>
                 <RectangleGeometry Rect="0 40 0 50"></RectangleGeometry>
-            </Image.Clip>-->
-        </Image>
+            </Image.Clip>
+        </Image>-->
         <Label x:Name="lblTeller" Margin="0,0,0,0" Content="" Panel.ZIndex="10"></Label>
     </Grid>
 </Window>
