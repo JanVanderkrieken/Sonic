@@ -49,7 +49,7 @@ namespace TestWPF
         double MyXSpeed, MyYSpeed = 0;
         double MyXAcceleration, MyYAcceleration = 0;
         const double GravityAcceleration = 1;
-        const double FrictionAcceleration = 0.5;
+        const double FrictionAcceleration = 0.25;
 
         public bool IsIntheAir = true; // a bool to check if he is in the air so he couldn't jump (again)
                                        // would set to true if SPACE would be pressed or he is using a spring up or fall from a cliff
@@ -207,7 +207,7 @@ namespace TestWPF
                     }
                     else
                     {
-                        MyXAcceleration += 2;
+                        MyXAcceleration += 1.5;
                         //MyXSpeed = 10;
                         IsFlipped = false;
                         //MoveMe(1, MyXSpeed, MyYSpeed);
@@ -240,7 +240,7 @@ namespace TestWPF
                         {
 
 
-                            MyXAcceleration += -2;
+                            MyXAcceleration += -1.5;
                             //MyXSpeed = -10;
                             IsFlipped = true;
                             //MoveMe(1, MyXSpeed, MyYSpeed);
@@ -315,7 +315,7 @@ namespace TestWPF
             }
             MyXSpeed += MyXAcceleration;
             MyYSpeed += MyYAcceleration;
-            MainWindow.DebugText(new Dictionary<string, string> { { "My Xspeed", MyXSpeed.ToString() }, { "My Yspeed", MyYSpeed.ToString() }, { "My X acc", MyXAcceleration.ToString() }, { "My Y acc", MyYAcceleration.ToString() } });
+            MainWindow.DebugText(new Dictionary<string, string> { { "My Xspeed", MyXSpeed.ToString() }, { "My Yspeed", MyYSpeed.ToString() }, { "My X acc", MyXAcceleration.ToString() }, { "My Y acc", MyYAcceleration.ToString() }, { "In air",IsIntheAir.ToString() } });
             MoveMe(Deltatime, MyXSpeed, MyYSpeed);
             ClipImage(SonicImageControl, MyRect, IsFlipped);
             //ClipImage(SonicImageControl, new Rect(0,0,sonicImage.Width,sonicImage.Height), IsFlipped);

@@ -152,14 +152,15 @@ namespace TestWPF
         private void DisTimer_Tick(object sender, EventArgs e)
         {
             sonic.Tick(1, KeysDown);
-            bool isMaphit = Map.HitMap(new System.Windows.Point(sonic.SonicImage.Margin.Left, sonic.SonicImage.Margin.Top + sonic.SonicImage.Margin.Bottom*2));
+            bool isMaphit = Map.HitMap(new System.Windows.Point((sonic.SonicImage.Margin.Left), sonic.SonicImage.Margin.Top + sonic.SonicImage.Margin.Bottom*2))|| Map.HitMap(new System.Windows.Point((sonic.SonicImage.Margin.Left + (sonic.SonicImage.Margin.Right)), sonic.SonicImage.Margin.Top));
             if (!isMaphit) sonic.IsIntheAir = true;
             while (isMaphit)
             {
                 sonic.MoveMe(1, 0, -1);
                 sonic.IsIntheAir = false;
-                isMaphit = Map.HitMap(new System.Windows.Point(sonic.SonicImage.Margin.Left, sonic.SonicImage.Margin.Top + sonic.SonicImage.Margin.Bottom * 2));
+                isMaphit = Map.HitMap(new System.Windows.Point(sonic.SonicImage.Margin.Left, sonic.SonicImage.Margin.Top + sonic.SonicImage.Margin.Bottom * 2))|| Map.HitMap(new System.Windows.Point((sonic.SonicImage.Margin.Left + (sonic.SonicImage.Margin.Right)), sonic.SonicImage.Margin.Top));
             }
+            if (!isMaphit) sonic.IsIntheAir = true;
             // TellerTick++;
             // TimerTeller++;
             // if (IsDdown)
